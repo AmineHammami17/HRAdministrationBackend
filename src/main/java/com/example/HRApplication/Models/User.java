@@ -1,5 +1,7 @@
 package com.example.HRApplication.Models;
 
+import com.example.HRApplication.Models.Enums.Roles;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "Users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
 public class User implements UserDetails {
     @Id
@@ -42,7 +45,6 @@ public class User implements UserDetails {
 
     @Column(name = "Status")
     private String status;
-
 
     public User(Integer id, String email, String password, Roles role, String firstname, String lastname, String job, Date datejoined, String status) {
         this.id = id;

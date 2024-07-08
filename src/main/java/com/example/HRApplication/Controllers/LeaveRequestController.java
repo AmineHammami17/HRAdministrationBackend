@@ -3,16 +3,21 @@ package com.example.HRApplication.Controllers;
 import com.example.HRApplication.Models.LeaveRequest;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.LeaveRequestService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("")
+@Tag(name="Leave Requests")
 public class LeaveRequestController {
 
     @Autowired
@@ -20,9 +25,11 @@ public class LeaveRequestController {
 
     @PostMapping("public/api/leave-requests/request")
     public ResponseEntity<LeaveRequest> createLeaveRequest(
-            @RequestBody LeaveRequest leaveRequest) {
+            @RequestBody LeaveRequest leaveRequest,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = (User) userDetails;
         LeaveRequest createdRequest = leaveRequestService.createLeaveRequest(
-                leaveRequest.getUser(), leaveRequest.getStartDate(), leaveRequest.getEndDate(),
+                currentUser, leaveRequest.getStartDate(), leaveRequest.getEndDate(),
                 leaveRequest.getReason(), "Pending");
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
     }
@@ -32,7 +39,8 @@ public class LeaveRequestController {
             @PathVariable Long requestId,
             @RequestBody LeaveRequest leaveRequest) {
         LeaveRequest updatedRequest = leaveRequestService.updateLeaveRequest(
-                requestId, leaveRequest.getStartDate(), leaveRequest.getEndDate(), leaveRequest.getReason());
+                requestId, leaveRequest.getStartDate(),
+                leaveRequest.getEndDate(), leaveRequest.getReason());
         return ResponseEntity.ok(updatedRequest);
     }
 
@@ -54,7 +62,7 @@ public class LeaveRequestController {
         return ResponseEntity.ok(deniedRequest);
     }
 
-    @GetMapping
+    @GetMapping("admin/api/leave-requests")
     public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests() {
         List<LeaveRequest> leaveRequests = leaveRequestService.getAllLeaveRequests();
         return ResponseEntity.ok(leaveRequests);
@@ -65,4 +73,10 @@ public class LeaveRequestController {
         LeaveRequest leaveRequest = leaveRequestService.findLeaveRequestById(requestId);
         return ResponseEntity.ok(leaveRequest);
     }
+    @GetMapping("admins/leave-days-for-all-users")
+    public ResponseEntity<Map<Long, Integer>> getLeaveDaysForAllUsers() {
+        Map<Long, Integer> leaveDaysForAllUsers = leaveRequestService.getLeaveDaysForAllUsers();
+        return ResponseEntity.ok(leaveDaysForAllUsers);
+    }
+
 }

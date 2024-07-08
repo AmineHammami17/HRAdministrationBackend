@@ -1,4 +1,4 @@
-package com.example.HRApplication.Models;
+package com.example.HRApplication.Models.Enums;
 
 public enum Roles {
 

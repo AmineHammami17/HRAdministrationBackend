@@ -1,6 +1,6 @@
 package com.example.HRApplication.DTO;
 
-import com.example.HRApplication.Models.Roles;
+import com.example.HRApplication.Models.Enums.Roles;
 import com.example.HRApplication.Models.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

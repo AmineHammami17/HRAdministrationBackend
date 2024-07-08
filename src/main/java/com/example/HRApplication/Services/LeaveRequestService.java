@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Service
 public class LeaveRequestService {
 
@@ -23,6 +26,7 @@ public class LeaveRequestService {
         return leaveRequestRepository.save(leaveRequest);
     }
 
+
     public LeaveRequest updateLeaveRequest(Long requestId, LocalDate startDate, LocalDate endDate, String reason) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
@@ -33,6 +37,8 @@ public class LeaveRequestService {
 
         return leaveRequestRepository.save(leaveRequest);
     }
+
+
 
     public void deleteLeaveRequest(Long requestId) {
         leaveRequestRepository.deleteById(requestId);
@@ -62,6 +68,19 @@ public class LeaveRequestService {
     public LeaveRequest findLeaveRequestById(Long requestId) {
         return leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
+    }
+
+    public Map<Long, Integer> getLeaveDaysForAllUsers() {
+        List<LeaveRequest> leaveRequests = leaveRequestRepository.findAll();
+        Map<Long, Integer> leaveDaysForAllUsers = new HashMap<>();
+
+        for (LeaveRequest leaveRequest : leaveRequests) {
+            Integer userId = leaveRequest.getUser().getId();
+            int days = (int) (leaveRequest.getEndDate().toEpochDay() - leaveRequest.getStartDate().toEpochDay());
+
+            leaveDaysForAllUsers.put(Long.valueOf(userId), leaveDaysForAllUsers.getOrDefault(userId, 0) + days);
+        }
+        return leaveDaysForAllUsers;
     }
 
 }

@@ -36,7 +36,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/auth/**", "/public/**").permitAll()
+                        .requestMatchers("/auth/**", "/public/**" , "/swagger-ui/**","/swagger-ui.html"
+                                ,"/v2/api-docs/**","/v3/api-docs/**","/v3/api-docs").permitAll()
                         .requestMatchers("/employee/**").hasAnyAuthority("EMPLOYEE")
                         .requestMatchers("/hradmin/**").hasAnyAuthority("ADMINHR")
                         .requestMatchers("/admin/**").hasAnyAuthority("ADMIN")
