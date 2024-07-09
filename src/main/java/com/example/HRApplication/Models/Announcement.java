@@ -1,36 +1,33 @@
 package com.example.HRApplication.Models;
 
-
+import io.swagger.v3.oas.annotations.info.Info;
 import jakarta.persistence.*;
-
-import java.util.Set;
+import lombok.Builder;
+import lombok.Data;
 
 @Entity
-@Table(name = "Announcements")
+@Table(name = "announcements")
+@Data
+@Builder
 public class Announcement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-
     private String description;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    @JoinTable(name="announcement_images",
-    joinColumns = {
-            @JoinColumn(name="announcement_id")
-    },
-    inverseJoinColumns = {
-            @JoinColumn(name="image_id")
-    })
-    private Set<ImageModel> AnnouncementImages;
+    @Lob
+    private byte[] displayPicture;
 
-    public Announcement(Long id, String title, String description, Set<ImageModel> announcementImages) {
+    public Announcement(Long id, String title, String description, byte[] displayPicture) {
         this.id = id;
         this.title = title;
         this.description = description;
-        AnnouncementImages = announcementImages;
+        this.displayPicture = displayPicture;
+    }
+
+    public Announcement() {
     }
 
 
@@ -58,11 +55,11 @@ public class Announcement {
         this.description = description;
     }
 
-    public Set<ImageModel> getAnnouncementImages() {
-        return AnnouncementImages;
+    public byte[] getDisplayPicture() {
+        return displayPicture;
     }
 
-    public void setAnnouncementImages(Set<ImageModel> announcementImages) {
-        AnnouncementImages = announcementImages;
+    public void setDisplayPicture(byte[] displayPicture) {
+        this.displayPicture = displayPicture;
     }
 }

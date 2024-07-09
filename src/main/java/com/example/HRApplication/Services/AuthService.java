@@ -1,6 +1,7 @@
 package com.example.HRApplication.Services;
 
 import com.example.HRApplication.DTO.ReqRes;
+import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +25,23 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+    public User getUserById(Integer id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Provider ID not Found"));
+    }
+    public User updateUser(User userInfo) {
+        User user = userRepository.findById(userInfo.getId()).orElseThrow(() -> new IllegalArgumentException("User ID not Found"));
+        user.setFirstname(userInfo.getFirstname());
+        user.setEmail(userInfo.getEmail());
+        user.setLastname(userInfo.getLastname());
+        user.setDatejoined(userInfo.getDatejoined());
+        user.setJob(userInfo.getJob());
+
+        return userRepository.save(user);
+    }
 
     public ReqRes signUp(ReqRes registrationRequest) {
         ReqRes resp = new ReqRes();
@@ -94,5 +113,13 @@ public class AuthService {
         response.setStatusCode(500);
         return response;
     }
+    public boolean deleteUser(Integer id) {
+        if (!userRepository.existsById(id)) {
+            return false;
+        }
+        userRepository.deleteById(id);
+        return true;
+    }
+
 }
 
