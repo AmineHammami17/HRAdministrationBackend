@@ -33,16 +33,14 @@ public class AnnouncementController {
         return ResponseEntity.ok(announcements);
     }
 
-    /*
-    @PostMapping
-    public ResponseEntity<Announcement> addAnnouncement(@RequestParam String title, @RequestParam String description , @RequestPart("file")MultipartFile file) throws IOException {
-        Announcement announcement=Announcement.builder().title(title).displayPicture(file.getBytes()).build();
-        announcementRepository.save(announcement);
-        announcement.setDisplayPicture(null);
-        return  ResponseEntity.ok(announcement);
+    @PostMapping(value="/upload" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Announcement> uploadAnnouncement(
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam("file") MultipartFile file) throws IOException {
+        Announcement announcement = announcementService.uploadAnnouncement(title, description, file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(announcement);
     }
-
-     */
 
 
 

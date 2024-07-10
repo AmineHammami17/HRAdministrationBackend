@@ -1,4 +1,4 @@
-package com.example.HRApplication.FileStorage;
+package com.example.HRApplication.Repositories;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;

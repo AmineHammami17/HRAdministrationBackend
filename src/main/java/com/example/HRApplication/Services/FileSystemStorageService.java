@@ -1,5 +1,10 @@
-package com.example.HRApplication.FileStorage;
+package com.example.HRApplication.Services;
 
+import com.example.HRApplication.Exceptions.StorageException;
+import com.example.HRApplication.Exceptions.StorageFileNotFoundException;
+import com.example.HRApplication.Repositories.StorageService;
+import com.example.HRApplication.Models.FileEntity;
+import com.example.HRApplication.Repositories.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;

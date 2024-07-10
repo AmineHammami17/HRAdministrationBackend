@@ -1,4 +1,4 @@
-package com.example.HRApplication.FileStorage;
+package com.example.HRApplication.Exceptions;
 
 
 public class StorageException extends RuntimeException {

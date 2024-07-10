@@ -20,6 +20,7 @@ public class Announcement {
     @Lob
     private byte[] displayPicture;
 
+
     public Announcement(Long id, String title, String description, byte[] displayPicture) {
         this.id = id;
         this.title = title;

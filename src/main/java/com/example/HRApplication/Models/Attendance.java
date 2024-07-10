@@ -37,6 +37,10 @@ public class Attendance {
         this.user = user;
     }
 
+    public Attendance() {
+
+    }
+
     public Long getAttendance_id() {
         return Attendance_id;
     }

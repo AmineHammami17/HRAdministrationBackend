@@ -1,4 +1,7 @@
-package com.example.HRApplication.FileStorage;
+package com.example.HRApplication.Exceptions;
+
+import com.example.HRApplication.Exceptions.StorageException;
+
 public class StorageFileNotFoundException extends StorageException {
 
     public StorageFileNotFoundException(String message) {

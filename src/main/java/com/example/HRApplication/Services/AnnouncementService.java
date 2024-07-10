@@ -2,6 +2,8 @@ package com.example.HRApplication.Services;
 
 import com.example.HRApplication.Models.Announcement;
 import com.example.HRApplication.Repositories.AnnouncementRepository;
+import com.example.HRApplication.Repositories.StorageService;
+import jdk.dynalink.NamedOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +17,19 @@ public class AnnouncementService {
 
     @Autowired
     private AnnouncementRepository announcementRepository;
+    @Autowired
+    private StorageService storageService;
 
-    public Announcement addAnnouncement(Announcement announcement) {
+    public Announcement uploadAnnouncement(String title, String description, MultipartFile file) throws IOException {
+        // Store the file
+        storageService.store(file);
+
+        // Create the announcement
+        Announcement announcement = new Announcement();
+        announcement.setTitle(title);
+        announcement.setDescription(description);
+        announcement.setDisplayPicture(file.getBytes());
+
         return announcementRepository.save(announcement);
     }
 
@@ -36,18 +49,6 @@ public class AnnouncementService {
         }
         return null;
     }
-    /*
-    public Announcement addAnnouncement(String title, String description, MultipartFile file) throws IOException {
-        Announcement announcement = Announcement.builder()
-                .title(title)
-                .description(description)
-                .displayPicture(file.getBytes())
-                .build();
-        return announcementRepository.save(announcement);
-    }
-    */
-
-
 
     public void deleteAnnouncement(Long id) {
         announcementRepository.deleteById(id);

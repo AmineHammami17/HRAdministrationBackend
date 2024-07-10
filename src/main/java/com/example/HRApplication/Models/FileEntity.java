@@ -1,4 +1,4 @@
-package com.example.HRApplication.FileStorage;
+package com.example.HRApplication.Models;
 
 
 import jakarta.persistence.*;
