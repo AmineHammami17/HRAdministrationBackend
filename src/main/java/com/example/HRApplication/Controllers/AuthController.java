@@ -2,6 +2,7 @@ package com.example.HRApplication.Controllers;
 
 import com.example.HRApplication.DTO.ReqRes;
 import com.example.HRApplication.Models.Complaint;
+import com.example.HRApplication.Models.Enums.Roles;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,31 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+
+    @GetMapping("/hradmin/auth/user/employee")
+    public ResponseEntity<List<User>> getAllEmployees() {
+        List<User> users = authService.getAllUsers().stream()
+                .filter(user -> Roles.EMPLOYEE.equals(user.getRole()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/hradmin/auth/user/employee/{id}")
+    public ResponseEntity<User> getEmployeeById(@PathVariable Integer id){
+        User user = authService.getUserById(id);
+        if (user == null || !Roles.EMPLOYEE.equals(user.getRole())) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
 
 
     @GetMapping("admin/auth/user")

@@ -1,7 +1,6 @@
 package com.example.HRApplication.Services;
 
 import com.example.HRApplication.DTO.ReqRes;
-import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +28,18 @@ public class AuthService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
     public User getUserById(Integer id) {
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Provider ID not Found"));
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User ID not Found"));
     }
+
     public User updateUser(User userInfo) {
         User user = userRepository.findById(userInfo.getId()).orElseThrow(() -> new IllegalArgumentException("User ID not Found"));
         user.setFirstname(userInfo.getFirstname());
-        user.setEmail(userInfo.getEmail());
         user.setLastname(userInfo.getLastname());
         user.setDatejoined(userInfo.getDatejoined());
         user.setJob(userInfo.getJob());
-
+        // Keep the original email and password
         return userRepository.save(user);
     }
 
@@ -52,7 +52,6 @@ public class AuthService {
                 resp.setStatusCode(400);
                 return resp;
             }
-
 
             User user = new User();
             user.setEmail(registrationRequest.getEmail());
@@ -76,14 +75,12 @@ public class AuthService {
         return resp;
     }
 
-
-    public ReqRes  signIn(ReqRes  signinRequest){
-        ReqRes  response = new ReqRes ();
+    public ReqRes signIn(ReqRes signinRequest) {
+        ReqRes response = new ReqRes();
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
             var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow();
-            System.out.println("USER IS: "+ user);
             var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
@@ -91,28 +88,31 @@ public class AuthService {
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Signed In");
-        }catch (Exception e){
+        } catch (Exception e) {
             response.setStatusCode(500);
             response.setError(e.getMessage());
         }
         return response;
     }
 
-    public ReqRes refreshToken(ReqRes refreshTokenReqiest){
+    public ReqRes refreshToken(ReqRes refreshTokenRequest) {
         ReqRes response = new ReqRes();
-        String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());
-        User users = userRepository.findByEmail(ourEmail).orElseThrow();
-        if (jwtUtils.isTokenValid(refreshTokenReqiest.getToken(), users)) {
-            var jwt = jwtUtils.generateToken(users);
+        String ourEmail = jwtUtils.extractUsername(refreshTokenRequest.getToken());
+        User user = userRepository.findByEmail(ourEmail).orElseThrow();
+        if (jwtUtils.isTokenValid(refreshTokenRequest.getToken(), user)) {
+            var jwt = jwtUtils.generateToken(user);
             response.setStatusCode(200);
             response.setToken(jwt);
-            response.setRefreshToken(refreshTokenReqiest.getToken());
+            response.setRefreshToken(refreshTokenRequest.getToken());
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Refreshed Token");
+        } else {
+            response.setStatusCode(500);
+            response.setMessage("Invalid Refresh Token");
         }
-        response.setStatusCode(500);
         return response;
     }
+
     public boolean deleteUser(Integer id) {
         if (!userRepository.existsById(id)) {
             return false;
@@ -120,6 +120,4 @@ public class AuthService {
         userRepository.deleteById(id);
         return true;
     }
-
 }
-
