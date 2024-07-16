@@ -1,6 +1,7 @@
 package com.example.HRApplication.Controllers;
 
 import com.example.HRApplication.DTO.ReqRes;
+import com.example.HRApplication.DTO.SignInDTO;
 import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.Enums.Roles;
 import com.example.HRApplication.Models.User;
@@ -65,9 +66,10 @@ public class AuthController {
     }
 
     @PostMapping("public/auth/signin")
-    public ResponseEntity<ReqRes> signIn(@RequestBody ReqRes signInRequest){
+    public ResponseEntity<ReqRes> signIn(@RequestBody SignInDTO signInRequest) {
         return ResponseEntity.ok(authService.signIn(signInRequest));
     }
+
 
     @PostMapping("public/auth/refresh")
     public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes refreshTokenRequest){

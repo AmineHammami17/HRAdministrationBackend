@@ -1,6 +1,8 @@
 package com.example.HRApplication.Services;
 
 import com.example.HRApplication.DTO.ReqRes;
+import com.example.HRApplication.DTO.SignInDTO;
+import com.example.HRApplication.Models.SalaryHistory;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,10 @@ public class AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private SalaryHistoryService salaryHistoryService;
+
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -34,15 +41,48 @@ public class AuthService {
     }
 
     public User updateUser(User userInfo) {
-        User user = userRepository.findById(userInfo.getId()).orElseThrow(() -> new IllegalArgumentException("User ID not Found"));
-        user.setFirstname(userInfo.getFirstname());
-        user.setLastname(userInfo.getLastname());
-        user.setDatejoined(userInfo.getDatejoined());
-        user.setJob(userInfo.getJob());
-        // Keep the original email and password
+        User user = userRepository.findById(userInfo.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User ID not Found"));
+
+        if (userInfo.getBaseSalary() != null && !userInfo.getBaseSalary().equals(user.getBaseSalary())) {
+            double oldSalary = user.getBaseSalary();
+            double newSalary = userInfo.getBaseSalary();
+            double percentageChange = calculatePercentageChange(oldSalary, newSalary);
+
+            SalaryHistory history = new SalaryHistory(
+                    null,
+                    user,
+                    "Base Salary Change",
+                    new Date(),
+                    "Base Salary",
+                    oldSalary,
+                    newSalary,
+                    percentageChange
+            );
+            salaryHistoryService.saveSalaryHistory(history);
+
+            user.setBaseSalary(newSalary);
+        }
+
+        if (userInfo.getFirstname() != null) {
+            user.setFirstname(userInfo.getFirstname());
+        }
+        if (userInfo.getLastname() != null) {
+            user.setLastname(userInfo.getLastname());
+        }
+        if (userInfo.getDatejoined() != null) {
+            user.setDatejoined(userInfo.getDatejoined());
+        }
+        if (userInfo.getJob() != null) {
+            user.setJob(userInfo.getJob());
+        }
+
         return userRepository.save(user);
     }
 
+    private double calculatePercentageChange(double oldSalary, double newSalary) {
+        return ((newSalary - oldSalary) / oldSalary) * 100;
+    }
     public ReqRes signUp(ReqRes registrationRequest) {
         ReqRes resp = new ReqRes();
         try {
@@ -57,7 +97,9 @@ public class AuthService {
             user.setEmail(registrationRequest.getEmail());
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             user.setRole(registrationRequest.getRole());
-
+            user.setJob(registrationRequest.getUser().getJob());
+            user.setDatejoined(registrationRequest.getUser().getDatejoined());
+            user.setBaseSalary(registrationRequest.getUser().getBaseSalary());
             User userResult = userRepository.save(user);
 
             if (userResult != null && userResult.getId() > 0) {
@@ -75,12 +117,13 @@ public class AuthService {
         return resp;
     }
 
-    public ReqRes signIn(ReqRes signinRequest) {
+    public ReqRes signIn(SignInDTO signinRequest) {
         ReqRes response = new ReqRes();
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
             var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow();
+            System.out.println("USER IS: " + user);
             var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
@@ -94,6 +137,7 @@ public class AuthService {
         }
         return response;
     }
+
 
     public ReqRes refreshToken(ReqRes refreshTokenRequest) {
         ReqRes response = new ReqRes();
