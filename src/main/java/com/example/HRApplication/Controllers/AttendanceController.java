@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/attendance")
 public class AttendanceController {
 
     @Autowired
@@ -79,7 +78,7 @@ public class AttendanceController {
         return ResponseEntity.ok(attendances);
     }
 
-    @DeleteMapping("/{attendanceId}")
+    @DeleteMapping("admins/api/attendance/{attendanceId}")
     public ResponseEntity<Void> deleteAttendance(@PathVariable Long attendanceId) {
         try {
             attendanceService.deleteAttendance(attendanceId);

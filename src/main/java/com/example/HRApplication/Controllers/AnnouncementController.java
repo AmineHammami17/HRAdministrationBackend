@@ -27,13 +27,15 @@ public class AnnouncementController {
 
 
 
+
+
     @GetMapping("/public/api/announcements")
     public ResponseEntity<List<Announcement>> getAllAnnouncements() {
         List<Announcement> announcements = announcementService.getAllAnnouncements();
         return ResponseEntity.ok(announcements);
     }
 
-    @PostMapping(value="/upload" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value="admins/api/announcements/upload" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Announcement> uploadAnnouncement(
             @RequestParam String title,
             @RequestParam String description,
