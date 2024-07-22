@@ -21,10 +21,8 @@ public class AnnouncementService {
     private StorageService storageService;
 
     public Announcement uploadAnnouncement(String title, String description, MultipartFile file) throws IOException {
-        // Store the file
         storageService.store(file);
 
-        // Create the announcement
         Announcement announcement = new Announcement();
         announcement.setTitle(title);
         announcement.setDescription(description);
@@ -45,6 +43,7 @@ public class AnnouncementService {
         Optional<Announcement> announcement = announcementRepository.findById(id);
         if (announcement.isPresent()) {
             updatedAnnouncement.setId(id);
+
             return announcementRepository.save(updatedAnnouncement);
         }
         return null;
