@@ -3,9 +3,11 @@ package com.example.HRApplication.Controllers;
 import com.example.HRApplication.Models.Task;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.TaskService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +16,16 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks")
+@Tag(name="Tasks")
+
 public class TaskController {
 
     @Autowired
     private TaskService taskService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN') || hasRole('') || hasRole('USER') ")
     public ResponseEntity<Task> createTask(@RequestBody Task task, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -32,12 +37,14 @@ public class TaskController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<List<Task>> getAllTasks() {
         List<Task> tasks = taskService.getAllTasks();
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE') ")
     public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
         Optional<Task> task = taskService.getTaskById(id);
         return task.map(ResponseEntity::ok)
@@ -45,12 +52,14 @@ public class TaskController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<List<Task>> getTasksByUser(@PathVariable Integer userId) {
         List<Task> tasks = taskService.getTasksByUser(userId);
         return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE') ")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task updatedTask) {
         Task task = taskService.updateTask(id, updatedTask);
         if (task == null) {
@@ -60,6 +69,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE') ")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         try {
             taskService.deleteTask(id);

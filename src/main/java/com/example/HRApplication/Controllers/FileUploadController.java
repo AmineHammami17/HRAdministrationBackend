@@ -2,11 +2,13 @@ package com.example.HRApplication.Controllers;
 
 import com.example.HRApplication.Exceptions.StorageFileNotFoundException;
 import com.example.HRApplication.Repositories.StorageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +16,9 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("admins/api/files")
+@RequestMapping("/api/files")
+@Tag(name="Files")
+
 public class FileUploadController {
 
     private final StorageService storageService;
@@ -25,12 +29,14 @@ public class FileUploadController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<List<String>> listUploadedFiles() throws IOException {
         List<String> fileNames = storageService.listAllFiles();
         return ResponseEntity.ok(fileNames);
     }
 
     @GetMapping("/{filename:.+}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
         Resource file = storageService.loadAsResource(filename);
 
@@ -43,6 +49,7 @@ public class FileUploadController {
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
         try {
             storageService.store(file);
@@ -53,6 +60,7 @@ public class FileUploadController {
     }
 
     @DeleteMapping("/{filename:.+}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<String> deleteFile(@PathVariable String filename) {
         storageService.delete(filename);
         return ResponseEntity.ok("Deleted file: " + filename);

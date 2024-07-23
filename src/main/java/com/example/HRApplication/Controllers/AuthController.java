@@ -6,21 +6,27 @@ import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.Enums.Roles;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/api/auth")
+@Tag(name="Authentication + Authorization")
+
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
 
-    @GetMapping("/hradmin/auth/user/employee")
+    @GetMapping("/user/employee")
+    @PreAuthorize("hasRole('ADMINHR')")
     public ResponseEntity<List<User>> getAllEmployees() {
         List<User> users = authService.getAllUsers().stream()
                 .filter(user -> Roles.EMPLOYEE.equals(user.getRole()))
@@ -28,7 +34,9 @@ public class AuthController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/hradmin/auth/user/employee/{id}")
+    @GetMapping("/user/employee/{id}")
+    @PreAuthorize("hasRole('ADMINHR')")
+
     public ResponseEntity<User> getEmployeeById(@PathVariable Integer id){
         User user = authService.getUserById(id);
         if (user == null || !Roles.EMPLOYEE.equals(user.getRole())) {
@@ -38,12 +46,15 @@ public class AuthController {
     }
 
 
-    @GetMapping("admin/auth/user")
+    @GetMapping("/user")
+    @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = authService.getAllUsers();
         return ResponseEntity.ok(users);
     }
-    @GetMapping("admin/auth/user/{id}")
+    @GetMapping("/user/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable Integer id){
         User user = authService.getUserById(id);
         if (user == null) {
@@ -53,30 +64,32 @@ public class AuthController {
 
     }
 
-    @PutMapping("public/auth/user/update-user/")
+    @PutMapping("/user/update-user/")
     public User updateUser(@RequestBody User user) {
         return authService.updateUser(user);
     }
 
 
 
-    @PostMapping("public/auth/signup")
+    @PostMapping("/signup")
     public ResponseEntity<ReqRes> signUp(@RequestBody ReqRes signUpRequest){
         return ResponseEntity.ok(authService.signUp(signUpRequest));
     }
 
-    @PostMapping("public/auth/signin")
+    @PostMapping("/signin")
     public ResponseEntity<ReqRes> signIn(@RequestBody SignInDTO signInRequest) {
         return ResponseEntity.ok(authService.signIn(signInRequest));
     }
 
 
-    @PostMapping("public/auth/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<ReqRes> refreshToken(@RequestBody ReqRes refreshTokenRequest){
         return ResponseEntity.ok(authService.refreshToken(refreshTokenRequest));
     }
 
-    @DeleteMapping("admin/auth/{id}")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
         boolean isDeleted = authService.deleteUser(id);
         if (!isDeleted) {

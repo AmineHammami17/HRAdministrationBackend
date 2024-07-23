@@ -1,10 +1,14 @@
 package com.example.HRApplication.Services;
 
+import com.example.HRApplication.Models.Holiday;
 import com.example.HRApplication.Models.Task;
+import com.example.HRApplication.Repositories.HolidayRepository;
 import com.example.HRApplication.Repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,9 +18,17 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private HolidayRepository holidayRepository;
+
     // Create a new task
     public Task createTask(Task task) {
-        return taskRepository.save(task);
+        if (isWorkDay(task.getDate())) {
+            return taskRepository.save(task);
+        } else {
+            throw new IllegalArgumentException("Cannot add task on non-working day");
+
+        }
     }
 
     // Retrieve all tasks
@@ -36,9 +48,14 @@ public class TaskService {
 
     // Update an existing task
     public Task updateTask(Long id, Task updatedTask) {
-        if (taskRepository.existsById(id)) {
-            updatedTask.setId(id); // Ensure the ID is set for update
-            return taskRepository.save(updatedTask);
+        if (isWorkDay(updatedTask.getDate())) {
+            if (taskRepository.existsById(id)) {
+            updatedTask.setId(id);
+            return taskRepository.save(updatedTask);}
+            else{
+                throw new IllegalArgumentException("Cannot update task on non-working day");
+
+            }
         } else {
             throw new RuntimeException("Task not found with id: " + id);
         }
@@ -52,4 +69,18 @@ public class TaskService {
             throw new RuntimeException("Task not found with id: " + id);
         }
     }
+
+// Check if the day is workday or a holiday
+    private boolean isWorkDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
+            return false;
+        }
+
+        List<Holiday> holidays = holidayRepository.findByDate(date);
+        return holidays.isEmpty();
+    }
+
 }

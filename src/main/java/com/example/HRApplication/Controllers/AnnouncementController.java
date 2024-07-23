@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ import java.util.Set;
 
 @RestController
 @Tag(name = "Announcements")
+@RequestMapping("/api/announcements")
 public class AnnouncementController {
 
     @Autowired
@@ -29,13 +31,17 @@ public class AnnouncementController {
 
 
 
-    @GetMapping("/public/api/announcements")
+    @GetMapping()
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
+
     public ResponseEntity<List<Announcement>> getAllAnnouncements() {
         List<Announcement> announcements = announcementService.getAllAnnouncements();
         return ResponseEntity.ok(announcements);
     }
 
-    @PostMapping(value="admins/api/announcements/upload" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value="/upload" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+
     public ResponseEntity<Announcement> uploadAnnouncement(
             @RequestParam String title,
             @RequestParam String description,
@@ -46,13 +52,16 @@ public class AnnouncementController {
 
 
 
-    @GetMapping("/public/api/announcement/{id}")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
     public ResponseEntity<Announcement> getAnnouncementById(@PathVariable Long id) {
         Optional<Announcement> announcement = announcementService.getAnnouncementById(id);
         return announcement.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/admins/api/announcement/{id}")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+
     public ResponseEntity<Announcement> updateAnnouncement(@PathVariable Long id, @RequestBody Announcement updatedAnnouncement) {
         Announcement announcement = announcementService.updateAnnouncement(id, updatedAnnouncement);
         if (announcement == null) {
@@ -61,7 +70,8 @@ public class AnnouncementController {
         return ResponseEntity.ok(announcement);
     }
 
-    @DeleteMapping("/admins/api/announcement/{id}")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
     public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
         announcementService.deleteAnnouncement(id);
         return ResponseEntity.noContent().build();

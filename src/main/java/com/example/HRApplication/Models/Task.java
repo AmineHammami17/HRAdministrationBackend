@@ -13,7 +13,7 @@ public class Task {
     private Long id;
 
     @Column(name = "date")
-    private LocalDate date;
+    private Date date;
 
     @Column(name = "activity_name")
     private String activityName;
@@ -26,7 +26,7 @@ public class Task {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public Task(Long id, LocalDate date, String activityName, Project project, User user) {
+    public Task(Long id, Date date, String activityName, Project project, User user) {
         this.id = id;
         this.date = date;
         this.activityName = activityName;
@@ -45,11 +45,11 @@ public class Task {
         this.id = id;
     }
 
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("api/leave-requests")
 @Tag(name="Leave Requests")
 public class LeaveRequestController {
 
     @Autowired
     private LeaveRequestService leaveRequestService;
 
-    @PostMapping("public/api/leave-requests/request")
+    @PostMapping()
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
     public ResponseEntity<LeaveRequest> createLeaveRequest(
             @RequestBody LeaveRequest leaveRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -34,7 +36,8 @@ public class LeaveRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
     }
 
-    @PutMapping("admins/api/leave-requests/{requestId}")
+    @PutMapping("/{requestId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
     public ResponseEntity<LeaveRequest> updateLeaveRequest(
             @PathVariable Long requestId,
             @RequestBody LeaveRequest leaveRequest) {
@@ -44,36 +47,43 @@ public class LeaveRequestController {
         return ResponseEntity.ok(updatedRequest);
     }
 
-    @DeleteMapping("admins/api/leave-requests/{requestId}")
+    @DeleteMapping("/{requestId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
     public ResponseEntity<Void> deleteLeaveRequest(@PathVariable Long requestId) {
         leaveRequestService.deleteLeaveRequest(requestId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("hradmin/api/leave-requests/approve/{requestId}")
+    @PutMapping("/approve/{requestId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+
     public ResponseEntity<LeaveRequest> approveLeaveRequest(@PathVariable Long requestId) {
         LeaveRequest approvedRequest = leaveRequestService.approveLeaveRequest(requestId);
         return ResponseEntity.ok(approvedRequest);
     }
 
-    @PutMapping("hradmin/api/leave-requests/deny/{requestId}")
+    @PutMapping("/deny/{requestId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<LeaveRequest> denyLeaveRequest(@PathVariable Long requestId) {
         LeaveRequest deniedRequest = leaveRequestService.denyLeaveRequest(requestId);
         return ResponseEntity.ok(deniedRequest);
     }
 
-    @GetMapping("admin/api/leave-requests")
+    @GetMapping()
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests() {
         List<LeaveRequest> leaveRequests = leaveRequestService.getAllLeaveRequests();
         return ResponseEntity.ok(leaveRequests);
     }
 
-    @GetMapping("admins/api/leave-requests/{requestId}")
+    @GetMapping("/{requestId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<LeaveRequest> findLeaveRequestById(@PathVariable Long requestId) {
         LeaveRequest leaveRequest = leaveRequestService.findLeaveRequestById(requestId);
         return ResponseEntity.ok(leaveRequest);
     }
     @GetMapping("admins/leave-days-for-all-users")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<Map<Long, Integer>> getLeaveDaysForAllUsers() {
         Map<Long, Integer> leaveDaysForAllUsers = leaveRequestService.getLeaveDaysForAllUsers();
         return ResponseEntity.ok(leaveDaysForAllUsers);
