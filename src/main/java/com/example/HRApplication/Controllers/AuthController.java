@@ -29,7 +29,7 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMINHR')")
     public ResponseEntity<List<User>> getAllEmployees() {
         List<User> users = authService.getAllUsers().stream()
-                .filter(user -> Roles.EMPLOYEE.equals(user.getRole()))
+                .filter(user -> Roles.ROLE_EMPLOYEE.equals(user.getRole()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
     }
@@ -39,7 +39,7 @@ public class AuthController {
 
     public ResponseEntity<User> getEmployeeById(@PathVariable Integer id){
         User user = authService.getUserById(id);
-        if (user == null || !Roles.EMPLOYEE.equals(user.getRole())) {
+        if (user == null || !Roles.ROLE_EMPLOYEE.equals(user.getRole())) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(user);

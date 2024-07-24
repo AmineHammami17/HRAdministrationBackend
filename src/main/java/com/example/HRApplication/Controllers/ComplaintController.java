@@ -39,7 +39,7 @@ public class ComplaintController {
 
 
 
-    @GetMapping("admins/api/complaint")
+    @GetMapping()
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
 
     public ResponseEntity<List<Complaint>> getAllComplaints() {
@@ -47,7 +47,7 @@ public class ComplaintController {
         return ResponseEntity.ok(complaints);
     }
 
-    @GetMapping("admins/api/complaint/{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<Complaint> getComplaintById(@PathVariable Long id) {
         Complaint complaint = complaintService.getComplaintById(id);

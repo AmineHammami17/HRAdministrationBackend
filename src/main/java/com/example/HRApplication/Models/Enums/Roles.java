@@ -2,8 +2,8 @@ package com.example.HRApplication.Models.Enums;
 
 public enum Roles {
 
-    EMPLOYEE,
-    ADMIN,
-    ADMINHR
+        ROLE_EMPLOYEE,
+        ROLE_ADMIN,
+        ROLE_ADMINHR
 
 }

@@ -20,7 +20,7 @@ public class HolidayController {
     private HolidayService holidayService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_ADMINHR') or hasRole('ROLE_EMPLOYEE')")
 
     public ResponseEntity<List<Holiday>> getAllHolidays() {
         List<Holiday> holidays = holidayService.getAllHolidays();
