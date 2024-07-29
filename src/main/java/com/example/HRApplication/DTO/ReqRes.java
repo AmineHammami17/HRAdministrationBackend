@@ -25,6 +25,28 @@ public class ReqRes {
     private Roles role;
     private String password;
     private User user;
+
+    public ReqRes(int statusCode, String error, String message, String token, String refreshToken, String expirationTime, String email, Roles role, String password, User user) {
+        this.statusCode = statusCode;
+        this.error = error;
+        this.message = message;
+        this.token = token;
+        this.refreshToken = refreshToken;
+        this.expirationTime = expirationTime;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+        this.user = user;
+    }
+
+    public ReqRes() {
+    }
+
+    public ReqRes(String s) {
+
+    }
+
+
     public int getStatusCode() {
         return statusCode;
     }
