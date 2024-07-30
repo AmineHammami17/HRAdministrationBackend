@@ -15,20 +15,19 @@ public class Holiday {
     @Column(name = "date", unique = true, nullable = false)
     private Date date;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "name")
+    private String name;
 
-    public Holiday(Long id, Date date, String description) {
+    public Holiday(Long id, Date date, String name) {
         this.id = id;
         this.date = date;
-        this.description = description;
+        this.name = name;
     }
 
     public Holiday() {
     }
 
-    // Getters and setters
-    public Long getId() {
+   public Long getId() {
         return id;
     }
 
@@ -44,11 +43,11 @@ public class Holiday {
         this.date = date;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(String name) {
+        this.name = name;
     }
 }
