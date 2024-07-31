@@ -3,16 +3,13 @@ package com.example.HRApplication.Models;
 import com.example.HRApplication.Models.Enums.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -36,19 +33,6 @@ public class User implements UserDetails {
     @Column(name = "Role")
     private Roles role;
 
-    public User(Integer id, String email, String password, Roles role, Double baseSalary, String firstname, String lastname, String job, LocalDate datejoined, String status, List<SalaryHistory> salaryHistories) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.baseSalary = baseSalary;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.job = job;
-        this.datejoined = datejoined;
-        this.status = status;
-        this.salaryHistories = salaryHistories;
-    }
 
     public Double getBaseSalary() {
         return baseSalary;
@@ -76,6 +60,13 @@ public class User implements UserDetails {
 
     @Column(name = "Status")
     private String status;
+
+
+    public List<SalaryHistory> getSalaryHistories() {
+        return salaryHistories;
+    }
+
+    private String resetToken;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("user")
     private List<SalaryHistory> salaryHistories;
@@ -96,6 +87,21 @@ public class User implements UserDetails {
         this.status = status;
         this.salaryHistories = salaryHistories;
     }
+    public User(Integer id, String email, String password, Roles role, Double baseSalary, String firstname, String lastname, String job, LocalDate datejoined, String status, String resetToken, List<SalaryHistory> salaryHistories) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.baseSalary = baseSalary;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.job = job;
+        this.datejoined = datejoined;
+        this.status = status;
+        this.resetToken = resetToken;
+        this.salaryHistories = salaryHistories;
+    }
+
 
 
     public User(Integer id, String email, String password, Roles role, String firstname, String lastname, String job, LocalDate datejoined, String status) {
@@ -216,5 +222,13 @@ public class User implements UserDetails {
     public void setStatus(String status) {
         this.status = status;
     }
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
 
 }

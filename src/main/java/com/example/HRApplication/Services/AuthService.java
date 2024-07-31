@@ -1,9 +1,12 @@
 package com.example.HRApplication.Services;
 
 import com.example.HRApplication.DTO.ReqRes;
+import com.example.HRApplication.DTO.ResetPasswordRequest;
 import com.example.HRApplication.DTO.SignInDTO;
+import com.example.HRApplication.Models.EmailDetails;
 import com.example.HRApplication.Models.SalaryHistory;
 import com.example.HRApplication.Models.User;
+import com.example.HRApplication.Repositories.EmailService;
 import com.example.HRApplication.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,10 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AuthService {
@@ -32,6 +32,10 @@ public class AuthService {
 
     @Autowired
     private SalaryHistoryService salaryHistoryService;
+
+
+    @Autowired
+    private EmailServiceImpl emailService;
 
 
     public List<User> getAllUsers() {
@@ -164,4 +168,39 @@ public class AuthService {
         userRepository.deleteById(id);
         return true;
     }
+
+    public String forgotPassword(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            String token = UUID.randomUUID().toString();
+            user.setResetToken(token);
+            userRepository.save(user);
+
+            String resetLink = "http://localhost:4200/reset-password?token=" + token;
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setRecipient(user.getEmail());
+            emailDetails.setSubject("Password Reset");
+            emailDetails.setMsgBody("Click the link to reset your password: " + resetLink);
+            emailService.sendSimpleMail(emailDetails);
+
+            return "Email sent";
+        }
+        return "Please Verify Your Email";
+    }
+
+
+
+    public String resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        Optional<User> userOptional = userRepository.findByResetToken(resetPasswordRequest.getToken());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+            user.setResetToken(null);
+            userRepository.save(user);
+            return "Password reset successfully";
+        }
+        return "Invalid token";
+    }
+
 }

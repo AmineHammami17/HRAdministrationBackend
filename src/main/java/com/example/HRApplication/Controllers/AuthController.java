@@ -1,6 +1,7 @@
 package com.example.HRApplication.Controllers;
 
 import com.example.HRApplication.DTO.ReqRes;
+import com.example.HRApplication.DTO.ResetPasswordRequest;
 import com.example.HRApplication.DTO.SignInDTO;
 import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.Enums.Roles;
@@ -8,6 +9,7 @@ import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -97,4 +99,22 @@ public class AuthController {
         }
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody String email) {
+        String response = authService.forgotPassword(email);
+        if (response.equals("Email sent")) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
+        String response = authService.resetPassword(resetPasswordRequest);
+        if (response.equals("Password reset successful")) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
 }

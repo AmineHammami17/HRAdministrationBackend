@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/attendance")
-@Tag(name="Announcements")
+@Tag(name="Attendance")
 
 public class AttendanceController {
 
