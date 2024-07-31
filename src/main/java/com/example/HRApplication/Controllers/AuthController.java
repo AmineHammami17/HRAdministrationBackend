@@ -111,10 +111,11 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
         String response = authService.resetPassword(resetPasswordRequest);
-        if (response.equals("Password reset successful")) {
+        if ("Password reset successfully".equals(response)) {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 }
