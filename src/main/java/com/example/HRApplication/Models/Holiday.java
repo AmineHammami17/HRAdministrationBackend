@@ -13,12 +13,12 @@ public class Holiday {
     private Long id;
 
     @Column(name = "date", unique = true, nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "name")
     private String name;
 
-    public Holiday(Long id, Date date, String name) {
+    public Holiday(Long id, LocalDate date, String name) {
         this.id = id;
         this.date = date;
         this.name = name;
@@ -35,11 +35,11 @@ public class Holiday {
         this.id = id;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

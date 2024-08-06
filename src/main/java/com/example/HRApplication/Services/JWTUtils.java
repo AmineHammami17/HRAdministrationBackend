@@ -27,7 +27,7 @@ public class JWTUtils {
 
     public String generateToken(UserDetails userDetails) {
         HashMap<String, Object> claims = new HashMap<>();
-        claims.put("role", userDetails.getAuthorities()); // Assuming authorities represent roles
+        claims.put("role", userDetails.getAuthorities()); 
 
         return createToken(claims, userDetails.getUsername());
     }

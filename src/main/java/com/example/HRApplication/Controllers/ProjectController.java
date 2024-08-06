@@ -15,7 +15,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/projects")
 @Tag(name="Projects")
-
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProjectController {
 
     @Autowired
@@ -29,7 +29,6 @@ public class ProjectController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE') ")
     public ResponseEntity<List<Project>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
         return new ResponseEntity<>(projects, HttpStatus.OK);
