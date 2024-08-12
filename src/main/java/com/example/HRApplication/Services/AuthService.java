@@ -93,6 +93,8 @@ public class AuthService {
     public ReqRes signUp(ReqRes registrationRequest) {
         ReqRes resp = new ReqRes();
         try {
+            System.out.println("Received Registration Request: " + registrationRequest);
+
             Optional<User> existingUser = userRepository.findByEmail(registrationRequest.getEmail());
             if (existingUser.isPresent()) {
                 resp.setMessage("Email already in use");
@@ -101,12 +103,24 @@ public class AuthService {
             }
 
             User user = new User();
-            user.setEmail(registrationRequest.getEmail());
             user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+            user.setEmail(registrationRequest.getEmail());
             user.setRole(registrationRequest.getRole());
-            user.setJob(registrationRequest.getUser().getJob());
-            user.setDatejoined(registrationRequest.getUser().getDatejoined());
-            user.setBaseSalary(registrationRequest.getUser().getBaseSalary());
+
+            if (registrationRequest.getUser() != null) {
+                User requestUser = registrationRequest.getUser();
+                user.setFirstname(requestUser.getFirstname());
+                user.setLastname(requestUser.getLastname());
+                user.setJob(requestUser.getJob());
+                user.setDatejoined(requestUser.getDatejoined());
+                user.setStatus(requestUser.getStatus());
+                user.setBaseSalary(requestUser.getBaseSalary());
+            } else {
+                resp.setMessage("User details are missing");
+                resp.setStatusCode(400);
+                return resp;
+            }
+
             User userResult = userRepository.save(user);
 
             if (userResult != null && userResult.getId() > 0) {

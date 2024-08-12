@@ -1,5 +1,7 @@
 package com.example.HRApplication.Models;
 
+import com.example.HRApplication.Models.Enums.LeaveReason;
+import com.example.HRApplication.Models.Enums.LeaveRequestStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -7,6 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "LeaveRequests")
 public class LeaveRequest {
+
 
 
     @Id
@@ -24,31 +27,41 @@ public class LeaveRequest {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "reason")
-    private String reason;
-
-    @Column(name = "status")
-    private String status;
-
-    public LeaveRequest() {
+    public LeaveRequest(User user, LocalDate startDate, LocalDate endDate, LeaveReason reason, LeaveRequestStatus status) {
+        this.user = user;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.reason = reason;
+        this.status = status;
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reason")
+    private LeaveReason reason;
 
-    public LeaveRequest(Long requestId, User user, LocalDate startDate, LocalDate endDate, String reason, String status) {
+
+    public LeaveRequestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(LeaveRequestStatus status) {
+        this.status = status;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="status")
+
+    private LeaveRequestStatus status;
+
+    public LeaveRequest(Long requestId, User user, LocalDate startDate, LocalDate endDate, LeaveReason reason) {
         this.requestId = requestId;
         this.user = user;
         this.startDate = startDate;
         this.endDate = endDate;
         this.reason = reason;
-        this.status = status;
     }
 
-    public LeaveRequest(User user, LocalDate startDate, LocalDate endDate, String reason, String status) {
-        this.user = user;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.reason = reason;
-        this.status = status;
+    public LeaveRequest() {
     }
 
     public Long getRequestId() {
@@ -83,19 +96,11 @@ public class LeaveRequest {
         this.endDate = endDate;
     }
 
-    public String getReason() {
+    public LeaveReason getReason() {
         return reason;
     }
 
-    public void setReason(String reason) {
+    public void setReason(LeaveReason reason) {
         this.reason = reason;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

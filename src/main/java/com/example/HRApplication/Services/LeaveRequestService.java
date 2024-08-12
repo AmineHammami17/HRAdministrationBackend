@@ -1,13 +1,16 @@
 package com.example.HRApplication.Services;
 
+import com.example.HRApplication.Models.Enums.LeaveReason;
 import com.example.HRApplication.Models.LeaveRequest;
 import com.example.HRApplication.Models.User;
+import com.example.HRApplication.Models.Enums.LeaveRequestStatus;
 import com.example.HRApplication.Repositories.LeaveRequestRepository;
 import com.example.HRApplication.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +24,21 @@ public class LeaveRequestService {
     @Autowired
     private UserRepository userRepository;
 
-    public LeaveRequest createLeaveRequest(User user, LocalDate startDate, LocalDate endDate, String reason , String status) {
-        LeaveRequest leaveRequest = new LeaveRequest(user, startDate, endDate, reason, "Pending");
+    public LeaveRequest createLeaveRequest(User user, LocalDate startDate, LocalDate endDate, LeaveReason reason, LeaveRequestStatus status) {
+        if (exceedsMaxDaysForUser(user, startDate, endDate, reason)) {
+            throw new IllegalArgumentException("Leave request exceeds maximum allowed days for reason: " + reason);
+        }
+        LeaveRequest leaveRequest = new LeaveRequest(user, startDate, endDate, reason, status);
         return leaveRequestRepository.save(leaveRequest);
     }
 
-
-    public LeaveRequest updateLeaveRequest(Long requestId, LocalDate startDate, LocalDate endDate, String reason) {
+    public LeaveRequest updateLeaveRequest(Long requestId, LocalDate startDate, LocalDate endDate, LeaveReason reason) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
 
+        if (exceedsMaxDaysForUser(leaveRequest.getUser(), startDate, endDate, reason)) {
+            throw new IllegalArgumentException("Leave request exceeds maximum allowed days for reason: " + reason);
+        }
 
         leaveRequest.setStartDate(startDate);
         leaveRequest.setEndDate(endDate);
@@ -38,8 +46,6 @@ public class LeaveRequestService {
 
         return leaveRequestRepository.save(leaveRequest);
     }
-
-
 
     public void deleteLeaveRequest(Long requestId) {
         leaveRequestRepository.deleteById(requestId);
@@ -49,16 +55,23 @@ public class LeaveRequestService {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
 
-        leaveRequest.setStatus("Approved");
+        long daysBetween = ChronoUnit.DAYS.between(leaveRequest.getStartDate(), leaveRequest.getEndDate()) + 1;
 
+        boolean exceedsMaxDays = exceedsMaxDaysForUser(leaveRequest.getUser(), leaveRequest.getStartDate(), leaveRequest.getEndDate(), leaveRequest.getReason());
+        if (exceedsMaxDays) {
+            throw new IllegalArgumentException("Approving this leave request would exceed the maximum allowed days for reason: " + leaveRequest.getReason());
+        }
+
+        leaveRequest.setStatus(LeaveRequestStatus.APPROVED);
         return leaveRequestRepository.save(leaveRequest);
     }
+
 
     public LeaveRequest denyLeaveRequest(Long requestId) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
 
-        leaveRequest.setStatus("Denied");
+        leaveRequest.setStatus(LeaveRequestStatus.REJECTED);
 
         return leaveRequestRepository.save(leaveRequest);
     }
@@ -66,23 +79,39 @@ public class LeaveRequestService {
     public List<LeaveRequest> getAllLeaveRequests() {
         return leaveRequestRepository.findAll();
     }
+
     public LeaveRequest findLeaveRequestById(Long requestId) {
         return leaveRequestRepository.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
     }
 
-    public Map<Long, Integer> getLeaveDaysForAllUsers() {
+    public Map<Integer, Integer> getLeaveDaysForAllUsers() {
         List<LeaveRequest> leaveRequests = leaveRequestRepository.findAll();
-        Map<Long, Integer> leaveDaysForAllUsers = new HashMap<>();
+        Map<Integer, Integer> leaveDaysForAllUsers = new HashMap<>();
 
         for (LeaveRequest leaveRequest : leaveRequests) {
             Integer userId = leaveRequest.getUser().getId();
-            int days = (int) (leaveRequest.getEndDate().toEpochDay() - leaveRequest.getStartDate().toEpochDay());
+            int days = (int) (leaveRequest.getEndDate().toEpochDay() - leaveRequest.getStartDate().toEpochDay() + 1); // Add 1 to include both start and end dates
 
-            leaveDaysForAllUsers.put(Long.valueOf(userId), leaveDaysForAllUsers.getOrDefault(userId, 0) + days);
+            leaveDaysForAllUsers.put(userId, leaveDaysForAllUsers.getOrDefault(userId, 0) + days);
         }
         return leaveDaysForAllUsers;
     }
 
-}
+    private boolean exceedsMaxDaysForUser(User user, LocalDate startDate, LocalDate endDate, LeaveReason reason) {
+        long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        int maxDays = reason.getMaxDays();
 
+        if (maxDays == 0) {
+            return false;
+        }
+
+        List<LeaveRequest> existingRequests = leaveRequestRepository.findByUserAndReasonAndStatus(user, reason, LeaveRequestStatus.APPROVED);
+        int totalDaysTaken = existingRequests.stream()
+                .mapToInt(r -> (int) (ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate()) + 1))
+                .sum();
+        totalDaysTaken += daysBetween;
+
+        return totalDaysTaken > maxDays;
+    }
+}

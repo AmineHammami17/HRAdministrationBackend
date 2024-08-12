@@ -52,4 +52,9 @@ public class AnnouncementService {
     public void deleteAnnouncement(Long id) {
         announcementRepository.deleteById(id);
     }
+
+    public byte[] getImage(Long oid) {
+        return announcementRepository.getImageByOid(oid);
+    }
+
 }

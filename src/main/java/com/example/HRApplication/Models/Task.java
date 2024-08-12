@@ -1,5 +1,6 @@
 package com.example.HRApplication.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -13,20 +14,22 @@ public class Task {
     private Long id;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "activity_name")
     private String activityName;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
+
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+
     private User user;
 
-    public Task(Long id, Date date, String activityName, Project project, User user) {
+    public Task(Long id, LocalDate date, String activityName, Project project, User user) {
         this.id = id;
         this.date = date;
         this.activityName = activityName;
@@ -45,11 +48,11 @@ public class Task {
         this.id = id;
     }
 
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

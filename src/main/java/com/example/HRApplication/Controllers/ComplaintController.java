@@ -1,9 +1,12 @@
 package com.example.HRApplication.Controllers;
 
 import com.example.HRApplication.Models.Complaint;
+import com.example.HRApplication.Models.Enums.Roles;
 import com.example.HRApplication.Models.LeaveRequest;
 import com.example.HRApplication.Models.User;
+import com.example.HRApplication.Services.AuthService;
 import com.example.HRApplication.Services.ComplaintService;
+import com.example.HRApplication.Services.UserDetailsServ;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Tag(name="Complaints")
@@ -23,17 +27,34 @@ public class ComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
-    @PostMapping()
-    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
-    public ResponseEntity<Complaint> addComplaint(@RequestBody Complaint complaint,
-                                                  @AuthenticationPrincipal UserDetails userDetails) {
+    @Autowired
+    private AuthService authService;
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('USER')")
+    public ResponseEntity<Complaint> addComplaint(@RequestBody Complaint complaint, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         User currentUser = (User) userDetails;
-        complaint.setFiledBy(currentUser);
+        boolean isAdmin = currentUser.getRole().equals(Roles.ROLE_ADMIN);
+
+        if (!isAdmin) {
+            complaint.setFiledBy(currentUser);
+        } else {
+            if (complaint.getFiledBy() == null || complaint.getFiledBy().getId() == 0) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            User assignedUser = authService.getUserById(complaint.getFiledBy().getId());
+            if (assignedUser == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            complaint.setFiledBy(assignedUser);
+        }
+
         Complaint createdComplaint = complaintService.addComplaint(complaint);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdComplaint);
+        return new ResponseEntity<>(createdComplaint, HttpStatus.CREATED);
     }
 
 

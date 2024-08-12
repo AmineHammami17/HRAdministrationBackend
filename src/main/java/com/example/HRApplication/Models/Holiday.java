@@ -1,13 +1,12 @@
 package com.example.HRApplication.Models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Table(name = "Holidays")
 public class Holiday {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +26,7 @@ public class Holiday {
     public Holiday() {
     }
 
-   public Long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -47,7 +46,7 @@ public class Holiday {
         return name;
     }
 
-    public void setDescription(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 }

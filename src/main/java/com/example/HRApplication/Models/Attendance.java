@@ -20,7 +20,7 @@ public class Attendance {
     private LocalDate date;
 
     @Column(name="start_time")
-    private LocalTime star_time;
+    private LocalTime start_time;
 
     @Column(name="end_time")
     private LocalTime end_time;
@@ -32,7 +32,7 @@ public class Attendance {
     public Attendance(Long attendance_id, LocalDate date, LocalTime star_time, LocalTime end_time, User user) {
         Attendance_id = attendance_id;
         this.date = date;
-        this.star_time = star_time;
+        this.start_time = star_time;
         this.end_time = end_time;
         this.user = user;
     }
@@ -58,11 +58,11 @@ public class Attendance {
     }
 
     public LocalTime getStar_time() {
-        return star_time;
+        return start_time;
     }
 
     public void setStar_time(LocalTime star_time) {
-        this.star_time = star_time;
+        this.start_time = star_time;
     }
 
     public LocalTime getEnd_time() {

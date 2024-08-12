@@ -1,7 +1,7 @@
 package com.example.HRApplication.Models;
 
 import com.example.HRApplication.Models.Enums.Roles;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "Users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 
 @Data
 public class User implements UserDetails {
@@ -62,6 +63,28 @@ public class User implements UserDetails {
     private String status;
 
 
+    public User(Integer id, String email, String password, Roles role, Double baseSalary, String firstname, String lastname, String job, LocalDate datejoined, String status, List<Task> tasks, String resetToken, List<SalaryHistory> salaryHistories) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.baseSalary = baseSalary;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.job = job;
+        this.datejoined = datejoined;
+        this.status = status;
+        this.tasks = tasks;
+        this.resetToken = resetToken;
+        this.salaryHistories = salaryHistories;
+    }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JsonIgnoreProperties("tasks")
+    private List<Task> tasks;
+
+
     public List<SalaryHistory> getSalaryHistories() {
         return salaryHistories;
     }
@@ -75,54 +98,16 @@ public class User implements UserDetails {
         this.salaryHistories = salaryHistories;
     }
 
-    public User(Integer id, String email, String password, Roles role, String firstname, String lastname, String job, LocalDate datejoined, String status, List<SalaryHistory> salaryHistories) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.job = job;
-        this.datejoined = datejoined;
-        this.status = status;
-        this.salaryHistories = salaryHistories;
-    }
-    public User(Integer id, String email, String password, Roles role, Double baseSalary, String firstname, String lastname, String job, LocalDate datejoined, String status, String resetToken, List<SalaryHistory> salaryHistories) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.baseSalary = baseSalary;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.job = job;
-        this.datejoined = datejoined;
-        this.status = status;
-        this.resetToken = resetToken;
-        this.salaryHistories = salaryHistories;
-    }
-
-
-
-    public User(Integer id, String email, String password, Roles role, String firstname, String lastname, String job, LocalDate datejoined, String status) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.job = job;
-        this.datejoined = datejoined;
-        this.status = status;
-    }
 
     public User() {
     }
 
     @Override
+    @JsonIgnore // Ignore this field during serialization
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+
 
     @Override
     public String getPassword() {
@@ -154,7 +139,6 @@ public class User implements UserDetails {
         return true;
     }
 
-    // Getters and setters
     public Integer getId() {
         return id;
     }
@@ -229,6 +213,12 @@ public class User implements UserDetails {
     public void setResetToken(String resetToken) {
         this.resetToken = resetToken;
     }
+    public List<Task> getTasks() {
+        return tasks;
+    }
 
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
 
 }

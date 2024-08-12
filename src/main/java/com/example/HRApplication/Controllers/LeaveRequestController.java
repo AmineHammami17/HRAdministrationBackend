@@ -1,7 +1,9 @@
 package com.example.HRApplication.Controllers;
 
+import com.example.HRApplication.Models.Enums.LeaveRequestStatus;
 import com.example.HRApplication.Models.LeaveRequest;
 import com.example.HRApplication.Models.User;
+import com.example.HRApplication.Models.Enums.LeaveReason;
 import com.example.HRApplication.Services.LeaveRequestService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/leave-requests")
-@Tag(name="Leave Requests")
+@Tag(name = "Leave Requests")
 public class LeaveRequestController {
 
     @Autowired
@@ -26,14 +28,18 @@ public class LeaveRequestController {
 
     @PostMapping()
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
-    public ResponseEntity<LeaveRequest> createLeaveRequest(
+    public ResponseEntity<?> createLeaveRequest(
             @RequestBody LeaveRequest leaveRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
+        try {
         User currentUser = (User) userDetails;
         LeaveRequest createdRequest = leaveRequestService.createLeaveRequest(
                 currentUser, leaveRequest.getStartDate(), leaveRequest.getEndDate(),
-                leaveRequest.getReason(), "Pending");
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);
+                leaveRequest.getReason(), LeaveRequestStatus.PENDING);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdRequest);}
+        catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/{requestId}")
@@ -56,10 +62,15 @@ public class LeaveRequestController {
 
     @PutMapping("/approve/{requestId}")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+    public ResponseEntity<?> approveLeaveRequest(@PathVariable Long requestId) {
+        try {
+            LeaveRequest approvedRequest = leaveRequestService.approveLeaveRequest(requestId);
+            return ResponseEntity.ok(approvedRequest);
+        }
+                catch(IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
-    public ResponseEntity<LeaveRequest> approveLeaveRequest(@PathVariable Long requestId) {
-        LeaveRequest approvedRequest = leaveRequestService.approveLeaveRequest(requestId);
-        return ResponseEntity.ok(approvedRequest);
     }
 
     @PutMapping("/deny/{requestId}")
@@ -82,11 +93,11 @@ public class LeaveRequestController {
         LeaveRequest leaveRequest = leaveRequestService.findLeaveRequestById(requestId);
         return ResponseEntity.ok(leaveRequest);
     }
-    @GetMapping("admins/leave-days-for-all-users")
+
+    @GetMapping("/admins/leave-days-for-all-users")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
-    public ResponseEntity<Map<Long, Integer>> getLeaveDaysForAllUsers() {
-        Map<Long, Integer> leaveDaysForAllUsers = leaveRequestService.getLeaveDaysForAllUsers();
+    public ResponseEntity<Map<Integer, Integer>> getLeaveDaysForAllUsers() {
+        Map<Integer, Integer> leaveDaysForAllUsers = leaveRequestService.getLeaveDaysForAllUsers();
         return ResponseEntity.ok(leaveDaysForAllUsers);
     }
-
 }

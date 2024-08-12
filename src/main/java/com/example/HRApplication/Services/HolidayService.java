@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HolidayService {
@@ -24,4 +25,18 @@ public class HolidayService {
     public void deleteHoliday(Long id) {
         holidayRepository.deleteById(id);
     }
+
+    public Holiday updateHoliday(Long id, Holiday updatedHoliday) {
+        if (holidayRepository.existsById(id)) {
+            updatedHoliday.setId(id);
+            return holidayRepository.save(updatedHoliday);
+        } else {
+            throw new RuntimeException("Holiday not found with id: " + id);
+        }
+    }
+
+    public Optional<Holiday> getHolidayById(Long id) {
+        return holidayRepository.findById(id);
+    }
+
 }

@@ -5,6 +5,7 @@ import com.example.HRApplication.Repositories.AnnouncementRepository;
 import com.example.HRApplication.Services.AnnouncementService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -75,5 +76,14 @@ public class AnnouncementController {
     public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
         announcementService.deleteAnnouncement(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/image/{oid}")
+    public ResponseEntity<byte[]> getImage(@PathVariable Long oid) {
+        byte[] imageData = announcementService.getImage(oid);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"image.jpg\"")
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(imageData);
     }
 }

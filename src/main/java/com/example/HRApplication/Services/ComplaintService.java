@@ -18,7 +18,7 @@ public class ComplaintService {
     private ComplaintRepository complaintRepository;
 
     public Complaint addComplaint(Complaint complaint) {
-        complaint.setStatus(ComplaintStatus.NOT_RESOLVED);
+        complaint.setStatus(ComplaintStatus.IN_PROGRESS);
         complaint.setCreatedDate(LocalDateTime.now());
         return complaintRepository.save(complaint);
     }

@@ -1,7 +1,9 @@
 package com.example.HRApplication.Controllers;
 
+import com.example.HRApplication.Models.Enums.Roles;
 import com.example.HRApplication.Models.Task;
 import com.example.HRApplication.Models.User;
+import com.example.HRApplication.Services.AuthService;
 import com.example.HRApplication.Services.TaskService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,33 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private AuthService authService;
+
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('') || hasRole('USER') ")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('USER')")
     public ResponseEntity<Task> createTask(@RequestBody Task task, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         User currentUser = (User) userDetails;
-        task.setUser(currentUser);
+
+        boolean isAdmin = currentUser.getRole().equals(Roles.ROLE_ADMIN);
+
+        if (!isAdmin) {
+            task.setUser(currentUser);
+        } else {
+            if (task.getUser() == null || task.getUser().getId() == 0) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            User assignedUser = authService.getUserById(task.getUser().getId());
+            if (assignedUser == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            task.setUser(assignedUser);
+        }
+
         Task createdTask = taskService.createTask(task);
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }

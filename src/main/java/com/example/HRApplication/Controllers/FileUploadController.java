@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/files")
@@ -61,10 +63,13 @@ public class FileUploadController {
 
     @DeleteMapping("/{filename:.+}")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
-    public ResponseEntity<String> deleteFile(@PathVariable String filename) {
+    public ResponseEntity<Map<String, String>> deleteFile(@PathVariable String filename) {
         storageService.delete(filename);
-        return ResponseEntity.ok("Deleted file: " + filename);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Deleted file: " + filename);
+        return ResponseEntity.ok(response);
     }
+
 
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
