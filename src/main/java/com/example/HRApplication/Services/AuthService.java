@@ -223,6 +223,10 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
+    public long countTotalUsers() {
+        return userRepository.count();
+    }
+
 
 
 

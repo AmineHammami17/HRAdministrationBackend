@@ -57,12 +57,12 @@ public class Attendance {
         this.date = date;
     }
 
-    public LocalTime getStar_time() {
+    public LocalTime getStart_time() {
         return start_time;
     }
 
-    public void setStar_time(LocalTime star_time) {
-        this.start_time = star_time;
+    public void setStar_time(LocalTime start_time) {
+        this.start_time = start_time;
     }
 
     public LocalTime getEnd_time() {
@@ -80,4 +80,5 @@ public class Attendance {
     public void setUser(User user) {
         this.user = user;
     }
+
 }

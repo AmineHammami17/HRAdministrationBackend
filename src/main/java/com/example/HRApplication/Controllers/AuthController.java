@@ -129,6 +129,12 @@ public class AuthController {
 
     }
 
+    @GetMapping("/count-users")
+    public ResponseEntity<Long> countTotalUsers() {
+        long userCount = authService.countTotalUsers();
+        return ResponseEntity.ok(userCount);
+    }
+
 
 
 }

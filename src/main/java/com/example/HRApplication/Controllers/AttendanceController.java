@@ -1,6 +1,7 @@
 package com.example.HRApplication.Controllers;
 
 import com.example.HRApplication.Models.Attendance;
+import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.AttendanceService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,6 +74,24 @@ public class AttendanceController {
         List<Attendance> attendances = attendanceService.viewAllAttendances();
         return ResponseEntity.ok(attendances);
     }
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+    public ResponseEntity<Attendance> getAttendanceById(@PathVariable Long id) {
+        Attendance attendance = attendanceService.getAttendanceById(id);
+        if (attendance == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(attendance);
+    }
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+    public ResponseEntity<Attendance> updateAttendance(@PathVariable Long id, @RequestBody Attendance updatedAttendance) {
+        Attendance attendance = attendanceService.updateAttendance(id, updatedAttendance);
+        if (attendance == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(attendance);
+    }
 
     @GetMapping("/user/{userId}/month")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
@@ -102,5 +121,11 @@ public class AttendanceController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/count-attendances")
+    public ResponseEntity<Long> countTotalAttendances() {
+        long attendancesCount = attendanceService.countTotalAttendances();
+        return ResponseEntity.ok(attendancesCount);
     }
 }

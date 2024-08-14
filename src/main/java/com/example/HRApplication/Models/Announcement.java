@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "announcements")
 @Data
@@ -16,6 +18,24 @@ public class Announcement {
 
     private String title;
     private String description;
+
+    public Announcement(Long id, String title, String description, LocalDate date, byte[] displayPicture) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        Date = date;
+        this.displayPicture = displayPicture;
+    }
+
+    public LocalDate getDate() {
+        return Date;
+    }
+
+    public void setDate(LocalDate date) {
+        Date = date;
+    }
+
+    private LocalDate Date;
 
     @Lob
     private byte[] displayPicture;

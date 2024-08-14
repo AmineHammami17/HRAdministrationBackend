@@ -10,3 +10,4 @@ public class HrApplication {
 		SpringApplication.run(HrApplication.class, args);
 	}
 }
+

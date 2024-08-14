@@ -85,13 +85,17 @@ public class LeaveRequestService {
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
     }
 
+    public List<LeaveRequest> getLeaveRequestByUserById(Integer userId) {
+        return leaveRequestRepository.findByUserId(userId);
+    }
+
     public Map<Integer, Integer> getLeaveDaysForAllUsers() {
         List<LeaveRequest> leaveRequests = leaveRequestRepository.findAll();
         Map<Integer, Integer> leaveDaysForAllUsers = new HashMap<>();
 
         for (LeaveRequest leaveRequest : leaveRequests) {
             Integer userId = leaveRequest.getUser().getId();
-            int days = (int) (leaveRequest.getEndDate().toEpochDay() - leaveRequest.getStartDate().toEpochDay() + 1); // Add 1 to include both start and end dates
+            int days = (int) (leaveRequest.getEndDate().toEpochDay() - leaveRequest.getStartDate().toEpochDay() + 1);
 
             leaveDaysForAllUsers.put(userId, leaveDaysForAllUsers.getOrDefault(userId, 0) + days);
         }

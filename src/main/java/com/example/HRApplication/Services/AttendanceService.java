@@ -1,14 +1,18 @@
 package com.example.HRApplication.Services;
 
 import com.example.HRApplication.Models.Attendance;
+import com.example.HRApplication.Models.Complaint;
+import com.example.HRApplication.Models.Enums.ComplaintStatus;
 import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Repositories.AttendanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AttendanceService {
@@ -62,8 +66,29 @@ public class AttendanceService {
     public List<Attendance> viewAttendanceByMonth(LocalDate startDate, LocalDate endDate) {
         return attendanceRepository.findByDateBetween(startDate, endDate);
     }
+    public Attendance updateAttendance(Long id, Attendance updatedAttendance) {
+        Optional<Attendance> attendanceOptional = attendanceRepository.findById(id);
+        if (attendanceOptional.isPresent()) {
+            Attendance attendance = attendanceOptional.get();
+            attendance.setDate(updatedAttendance.getDate());
+            attendance.setStar_time(updatedAttendance.getStart_time());
+            attendance.setEnd_time(updatedAttendance.getEnd_time());
+            return attendanceRepository.save(attendance);
+        }
+        return null;
+    }
 
     public void deleteAttendance(Long attendanceId) {
         attendanceRepository.deleteById(attendanceId);
     }
+
+    public Attendance getAttendanceById(Long id) {
+        Optional<Attendance> attendanceOptional = attendanceRepository.findById(id);
+        return attendanceOptional.orElse(null);
+    }
+
+    public long countTotalAttendances() {
+        return attendanceRepository.count();
+    }
+
 }

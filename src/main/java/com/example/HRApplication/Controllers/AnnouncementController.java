@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @Tag(name = "Announcements")
@@ -46,6 +43,7 @@ public class AnnouncementController {
     public ResponseEntity<Announcement> uploadAnnouncement(
             @RequestParam String title,
             @RequestParam String description,
+            @RequestParam Date date,
             @RequestParam("file") MultipartFile file) throws IOException {
         Announcement announcement = announcementService.uploadAnnouncement(title, description, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(announcement);

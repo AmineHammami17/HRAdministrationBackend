@@ -85,12 +85,13 @@ public class User implements UserDetails {
     private List<Task> tasks;
 
 
+
     public List<SalaryHistory> getSalaryHistories() {
         return salaryHistories;
     }
 
     private String resetToken;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     @JsonIgnoreProperties("user")
     private List<SalaryHistory> salaryHistories;
 

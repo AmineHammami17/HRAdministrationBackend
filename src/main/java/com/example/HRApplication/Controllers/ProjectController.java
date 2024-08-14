@@ -63,4 +63,10 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @GetMapping("/count-projects")
+    public ResponseEntity<Long> countTotalProjects() {
+        long projectCount = projectService.countTotalProjects();
+        return ResponseEntity.ok(projectCount);
+    }
 }

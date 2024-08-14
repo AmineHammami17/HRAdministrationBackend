@@ -94,6 +94,12 @@ public class LeaveRequestController {
         return ResponseEntity.ok(leaveRequest);
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<LeaveRequest>> getLeaveRequestsByUserId(@PathVariable Integer userId) {
+        List<LeaveRequest> leaveRequests = leaveRequestService.getLeaveRequestByUserById(userId);
+        return ResponseEntity.ok(leaveRequests);
+    }
+
     @GetMapping("/admins/leave-days-for-all-users")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<Map<Integer, Integer>> getLeaveDaysForAllUsers() {
