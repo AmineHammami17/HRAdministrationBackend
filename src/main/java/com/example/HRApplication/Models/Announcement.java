@@ -23,19 +23,19 @@ public class Announcement {
         this.id = id;
         this.title = title;
         this.description = description;
-        Date = date;
+        this.date = date;
         this.displayPicture = displayPicture;
     }
 
     public LocalDate getDate() {
-        return Date;
+        return date;
     }
 
     public void setDate(LocalDate date) {
-        Date = date;
+        this.date = date;
     }
 
-    private LocalDate Date;
+    private LocalDate date;
 
     @Lob
     private byte[] displayPicture;

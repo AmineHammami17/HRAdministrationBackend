@@ -65,6 +65,13 @@ public class HolidayController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
+    @GetMapping("/upcoming-holidays")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_ADMINHR') or hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<List<Holiday>> getUpcomingHolidays() {
+        List<Holiday> holidays = holidayService.getUpcomingHolidays();
+        return ResponseEntity.ok(holidays);
+    }
+
 
 
 }

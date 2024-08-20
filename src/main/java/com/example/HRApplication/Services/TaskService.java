@@ -5,10 +5,12 @@ import com.example.HRApplication.Models.Task;
 import com.example.HRApplication.Repositories.HolidayRepository;
 import com.example.HRApplication.Repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,4 +73,13 @@ public class TaskService {
         List<Holiday> holidays = holidayRepository.findByDate(date);
         return holidays.isEmpty();
     }
+
+    public List<Task> getTasksForWeek(LocalDate date, Integer userId){
+        LocalDate startOfWeek=date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endOfWeek=date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+
+        return taskRepository.findTasksByUserIdAndDateRange(userId,startOfWeek,endOfWeek);
+
+    }
+
 }

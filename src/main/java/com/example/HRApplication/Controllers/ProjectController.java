@@ -1,5 +1,6 @@
 package com.example.HRApplication.Controllers;
 
+import com.example.HRApplication.DTO.ProjectTaskCountDTO;
 import com.example.HRApplication.Models.Project;
 import com.example.HRApplication.Services.ProjectService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,10 +64,16 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/count-projects")
     public ResponseEntity<Long> countTotalProjects() {
         long projectCount = projectService.countTotalProjects();
         return ResponseEntity.ok(projectCount);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/task-counts")
+    public List<ProjectTaskCountDTO> getProjectTaskCounts() {
+        return projectService.getProjectTaskCounts();
     }
 }

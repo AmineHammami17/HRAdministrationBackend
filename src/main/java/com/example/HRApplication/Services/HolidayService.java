@@ -5,6 +5,7 @@ import com.example.HRApplication.Repositories.HolidayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,5 +39,9 @@ public class HolidayService {
     public Optional<Holiday> getHolidayById(Long id) {
         return holidayRepository.findById(id);
     }
-
+    public List<Holiday> getUpcomingHolidays() {
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusDays(31);
+        return holidayRepository.findHolidaysBetweenDates(today, endDate);
+    }
 }

@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class LeaveRequestService {
@@ -101,7 +102,23 @@ public class LeaveRequestService {
         }
         return leaveDaysForAllUsers;
     }
+    public Map<String, Integer> getLeaveDetailsForUserAndReason(Integer userId, LeaveReason reason) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        List<LeaveRequest> existingRequests = leaveRequestRepository.findByUserAndReasonAndStatus(user, reason, LeaveRequestStatus.APPROVED);
+
+        int totalDaysTaken = existingRequests.stream()
+                .mapToInt(r -> (int) (ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate()) + 1))
+                .sum();
+
+        int maxDays = reason.getMaxDays();
+        Map<String, Integer> result = new HashMap<>();
+        result.put("currentDays", totalDaysTaken);
+        result.put("maxDays", maxDays);
+
+        return result;
+    }
     private boolean exceedsMaxDaysForUser(User user, LocalDate startDate, LocalDate endDate, LeaveReason reason) {
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
         int maxDays = reason.getMaxDays();
@@ -118,4 +135,20 @@ public class LeaveRequestService {
 
         return totalDaysTaken > maxDays;
     }
+
+    public List<User> getEmployeesCurrentlyOnLeave() {
+        LocalDate today = LocalDate.now();
+
+        List<LeaveRequest> currentLeaveRequests = leaveRequestRepository.findAll().stream()
+                .filter(leaveRequest -> leaveRequest.getStatus() == LeaveRequestStatus.APPROVED &&
+                        !leaveRequest.getStartDate().isAfter(today) &&
+                        !leaveRequest.getEndDate().isBefore(today))
+                .collect(Collectors.toList());
+
+        return currentLeaveRequests.stream()
+                .map(LeaveRequest::getUser)
+                .distinct()
+                .collect(Collectors.toList());
+    }
 }
+

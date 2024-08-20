@@ -99,11 +99,25 @@ public class LeaveRequestController {
         List<LeaveRequest> leaveRequests = leaveRequestService.getLeaveRequestByUserById(userId);
         return ResponseEntity.ok(leaveRequests);
     }
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
+    @GetMapping("/details")
+    public Map<String, Integer> getLeaveDetails(
+            @RequestParam Integer userId,
+            @RequestParam String reason) {
 
+        LeaveReason leaveReason = LeaveReason.fromString(reason);
+        return leaveRequestService.getLeaveDetailsForUserAndReason(userId, leaveReason);
+    }
     @GetMapping("/admins/leave-days-for-all-users")
     @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
     public ResponseEntity<Map<Integer, Integer>> getLeaveDaysForAllUsers() {
         Map<Integer, Integer> leaveDaysForAllUsers = leaveRequestService.getLeaveDaysForAllUsers();
         return ResponseEntity.ok(leaveDaysForAllUsers);
+    }
+
+    @GetMapping("/employees-on-leave")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')")
+    public List<User> getEmployeesCurrentlyOnLeave() {
+        return leaveRequestService.getEmployeesCurrentlyOnLeave();
     }
 }

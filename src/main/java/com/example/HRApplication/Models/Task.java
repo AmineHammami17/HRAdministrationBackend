@@ -19,6 +19,10 @@ public class Task {
     @Column(name = "activity_name")
     private String activityName;
 
+
+    @Column(name="time_spent")
+    private Long timeSpent;
+
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
 
@@ -29,15 +33,17 @@ public class Task {
 
     private User user;
 
-    public Task(Long id, LocalDate date, String activityName, Project project, User user) {
+
+    public Task() {
+    }
+
+    public Task(Long id, LocalDate date, String activityName, Long timeSpent, Project project, User user) {
         this.id = id;
         this.date = date;
         this.activityName = activityName;
+        this.timeSpent = timeSpent;
         this.project = project;
         this.user = user;
-    }
-
-    public Task() {
     }
 
     public Long getId() {
@@ -78,5 +84,13 @@ public class Task {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Long getTimeSpent() {
+        return timeSpent;
+    }
+
+    public void setTimeSpent(Long timeSpent) {
+        this.timeSpent = timeSpent;
     }
 }
