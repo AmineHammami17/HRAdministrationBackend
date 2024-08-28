@@ -90,5 +90,17 @@ public class AttendanceService {
     public long countTotalAttendances() {
         return attendanceRepository.count();
     }
+    public Boolean testAttendanceByUser(User user) {
+        LocalDate today = LocalDate.now();
+        Boolean test=false;
+        if (attendanceRepository.findByUserIdAndDateBetween(user.getId(), today, today).isEmpty()) {
+            test=true;
+        }
+        return test;
+    }
+    public List<Attendance> getAtendanceBydate(User user) {
+        LocalDate today = LocalDate.now();
+        return attendanceRepository.findByUserIdAndDateBetween(user.getId(), today, today);
+    }
 
 }

@@ -34,15 +34,6 @@ public class User implements UserDetails {
     @Column(name = "Role")
     private Roles role;
 
-
-    public Double getBaseSalary() {
-        return baseSalary;
-    }
-
-    public void setBaseSalary(Double baseSalary) {
-        this.baseSalary = baseSalary;
-    }
-
     @Column(name = "Base_Salary")
     private Double baseSalary;
 
@@ -62,8 +53,22 @@ public class User implements UserDetails {
     @Column(name = "Status")
     private String status;
 
+    private String resetToken;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @JsonIgnoreProperties("user")
+    private List<SalaryHistory> salaryHistories;
 
-    public User(Integer id, String email, String password, Roles role, Double baseSalary, String firstname, String lastname, String job, LocalDate datejoined, String status, List<Task> tasks, String resetToken, List<SalaryHistory> salaryHistories) {
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonBackReference
+    @JsonIgnoreProperties("tasks")
+    private List<Task> tasks;
+
+
+    @Lob
+    private Long displayPicture;
+    private String displayPictureFilename;
+
+    public User(Integer id, String email, String password, Roles role, Double baseSalary, String firstname, String lastname, String job, LocalDate datejoined, String status, String resetToken, List<SalaryHistory> salaryHistories, List<Task> tasks, Long displayPicture, String displayPictureFilename) {
         this.id = id;
         this.email = email;
         this.password = password;
@@ -74,26 +79,18 @@ public class User implements UserDetails {
         this.job = job;
         this.datejoined = datejoined;
         this.status = status;
-        this.tasks = tasks;
         this.resetToken = resetToken;
         this.salaryHistories = salaryHistories;
+        this.tasks = tasks;
+        this.displayPicture = displayPicture;
+        this.displayPictureFilename = displayPictureFilename;
     }
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonBackReference
-    @JsonIgnoreProperties("tasks")
-    private List<Task> tasks;
-
 
 
     public List<SalaryHistory> getSalaryHistories() {
         return salaryHistories;
     }
 
-    private String resetToken;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    @JsonIgnoreProperties("user")
-    private List<SalaryHistory> salaryHistories;
 
     public void setSalaryHistories(List<SalaryHistory> salaryHistories) {
         this.salaryHistories = salaryHistories;
@@ -104,7 +101,7 @@ public class User implements UserDetails {
     }
 
     @Override
-    @JsonIgnore // Ignore this field during serialization
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
@@ -221,5 +218,30 @@ public class User implements UserDetails {
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
     }
+
+    public Double getBaseSalary() {
+        return baseSalary;
+    }
+
+    public void setBaseSalary(Double baseSalary) {
+        this.baseSalary = baseSalary;
+    }
+
+    public Long getDisplayPicture() {
+        return displayPicture;
+    }
+
+    public void setDisplayPicture(Long displayPicture) {
+        this.displayPicture = displayPicture;
+    }
+
+    public String getDisplayPictureFilename() {
+        return displayPictureFilename;
+    }
+
+    public void setDisplayPictureFilename(String displayPictureFilename) {
+        this.displayPictureFilename = displayPictureFilename;
+    }
+
 
 }

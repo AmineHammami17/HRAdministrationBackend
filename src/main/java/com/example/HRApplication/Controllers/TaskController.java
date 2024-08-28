@@ -32,7 +32,7 @@ public class TaskController {
     private AuthService authService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('EMPLOYEE') || hasRole('ADMINHR')")
     public ResponseEntity<Task> createTask(@RequestBody Task task, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

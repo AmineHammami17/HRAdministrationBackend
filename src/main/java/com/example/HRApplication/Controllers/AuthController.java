@@ -9,13 +9,17 @@ import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Services.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,6 +137,29 @@ public class AuthController {
     public ResponseEntity<Long> countTotalUsers() {
         long userCount = authService.countTotalUsers();
         return ResponseEntity.ok(userCount);
+    }
+
+    @PostMapping("/user/{id}/upload-picture")
+    public ResponseEntity<User> uploadUserProfilePicture(
+            @PathVariable Integer id,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            User updatedUser = authService.uploadUserProfilePicture(id, file);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @GetMapping("/image/{filename}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
+        byte[] imageData = authService.getImage(filename);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(imageData);
     }
 
 

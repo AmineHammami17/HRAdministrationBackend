@@ -3,12 +3,14 @@ package com.example.HRApplication.Services;
 import com.example.HRApplication.Models.Announcement;
 import com.example.HRApplication.Repositories.AnnouncementRepository;
 import com.example.HRApplication.Repositories.StorageService;
-import jdk.dynalink.NamedOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,15 +20,16 @@ public class AnnouncementService {
     @Autowired
     private AnnouncementRepository announcementRepository;
     @Autowired
-    private StorageService storageService;
+    private FileSystemStorageService fileSystemStorageService;
 
-    public Announcement uploadAnnouncement(String title, String description, MultipartFile file) throws IOException {
-        storageService.store(file);
-
+    public Announcement uploadAnnouncement(String title, String description, MultipartFile file, LocalDate date) throws IOException {
+        String filename = file.getOriginalFilename();
+        fileSystemStorageService.store(file);
         Announcement announcement = new Announcement();
         announcement.setTitle(title);
         announcement.setDescription(description);
-        announcement.setDisplayPicture(file.getBytes());
+        announcement.setDate(date);
+        announcement.setDisplayPictureFilename(filename);
 
         return announcementRepository.save(announcement);
     }
@@ -43,19 +46,27 @@ public class AnnouncementService {
         Optional<Announcement> announcement = announcementRepository.findById(id);
         if (announcement.isPresent()) {
             updatedAnnouncement.setId(id);
-
-
             return announcementRepository.save(updatedAnnouncement);
         }
         return null;
     }
 
     public void deleteAnnouncement(Long id) {
-        announcementRepository.deleteById(id);
+        Optional<Announcement> announcement = announcementRepository.findById(id);
+        if (announcement.isPresent()) {
+            String filename = announcement.get().getDisplayPictureFilename();
+            fileSystemStorageService.delete(filename);
+
+            announcementRepository.deleteById(id);
+        }
     }
 
-    public byte[] getImage(Long oid) {
-        return announcementRepository.getImageByOid(oid);
+    public byte[] getImage(String filename) {
+        try {
+            Resource resource = fileSystemStorageService.loadAsResource(filename);
+            return resource.getInputStream().readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file", e);
+        }
     }
-
 }

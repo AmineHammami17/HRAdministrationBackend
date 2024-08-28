@@ -128,4 +128,17 @@ public class AttendanceController {
         long attendancesCount = attendanceService.countTotalAttendances();
         return ResponseEntity.ok(attendancesCount);
     }
+
+    @GetMapping("/test")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
+    public Boolean testAttendance(@AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = (User) userDetails;
+        return attendanceService.testAttendanceByUser(currentUser);
+    }
+    @GetMapping("/getByDate")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
+    public List<Attendance> getAttendanceByDate(@AuthenticationPrincipal UserDetails userDetails) {
+        User currentUser = (User) userDetails;
+        return attendanceService.getAtendanceBydate(currentUser);
+    }
 }

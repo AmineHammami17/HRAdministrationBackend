@@ -94,13 +94,12 @@ public class ComplaintController {
         complaintService.deleteComplaint(id);
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("/user")
-    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR')|| hasRole('EMPLOYEE')")
-    public ResponseEntity<List<Complaint>> getComplaintsForLoggedInUser(@AuthenticationPrincipal UserDetails userDetails) {
-        User currentUser = (User) userDetails;
-        List<Complaint> complaints = complaintService.getComplaintsByUser(currentUser);
+    @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') || hasRole('ADMINHR') || hasRole('EMPLOYEE')")
+    public ResponseEntity<List<Complaint>> getComplaintsByUserId(@PathVariable Integer userId) {
+        List<Complaint> complaints = complaintService.getComplaintsByUserId(userId);
         return ResponseEntity.ok(complaints);
     }
+
 
 }

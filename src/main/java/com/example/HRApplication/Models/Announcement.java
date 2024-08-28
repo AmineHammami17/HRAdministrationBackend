@@ -19,13 +19,43 @@ public class Announcement {
     private String title;
     private String description;
 
-    public Announcement(Long id, String title, String description, LocalDate date, byte[] displayPicture) {
+
+
+    private LocalDate date;
+
+    @Lob
+    private Long displayPicture;
+    private String displayPictureFilename;
+
+    public Announcement(Long id, String title, String description, LocalDate date, Long displayPicture, String displayPictureFilename) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.date = date;
+        this.displayPicture = displayPicture;
+        this.displayPictureFilename = displayPictureFilename;
+    }
+
+    public String getDisplayPictureFilename() {
+        return displayPictureFilename;
+    }
+
+    public void setDisplayPictureFilename(String displayPictureFilename) {
+        this.displayPictureFilename = displayPictureFilename;
+    }
+
+
+    public Announcement() {
+    }
+
+    public Announcement(Long id, String title, String description, LocalDate date, Long displayPicture) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.date = date;
         this.displayPicture = displayPicture;
     }
+
 
     public LocalDate getDate() {
         return date;
@@ -34,23 +64,6 @@ public class Announcement {
     public void setDate(LocalDate date) {
         this.date = date;
     }
-
-    private LocalDate date;
-
-    @Lob
-    private byte[] displayPicture;
-
-
-    public Announcement(Long id, String title, String description, byte[] displayPicture) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.displayPicture = displayPicture;
-    }
-
-    public Announcement() {
-    }
-
 
     public Long getId() {
         return id;
@@ -76,11 +89,11 @@ public class Announcement {
         this.description = description;
     }
 
-    public byte[] getDisplayPicture() {
+    public Long getDisplayPicture() {
         return displayPicture;
     }
 
-    public void setDisplayPicture(byte[] displayPicture) {
+    public void setDisplayPicture(Long displayPicture) {
         this.displayPicture = displayPicture;
     }
 }

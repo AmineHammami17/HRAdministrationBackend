@@ -9,6 +9,7 @@ import com.example.HRApplication.Models.User;
 import com.example.HRApplication.Repositories.EmailService;
 import com.example.HRApplication.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -37,6 +40,9 @@ public class AuthService {
 
     @Autowired
     private EmailServiceImpl emailService;
+
+    @Autowired
+    private FileSystemStorageService fileSystemStorageService;
 
 
     public List<User> getAllUsers() {
@@ -227,6 +233,26 @@ public class AuthService {
         return userRepository.count();
     }
 
+    public User uploadUserProfilePicture(Integer userId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User ID not Found"));
+
+        String filename = file.getOriginalFilename();
+        fileSystemStorageService.store(file);
+
+        user.setDisplayPictureFilename(filename);
+
+        return userRepository.save(user);
+    }
+
+    public byte[] getImage(String filename) {
+        try {
+            Resource resource = fileSystemStorageService.loadAsResource(filename);
+            return resource.getInputStream().readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file", e);
+        }
+    }
 
 
 

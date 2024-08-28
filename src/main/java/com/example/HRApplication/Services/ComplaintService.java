@@ -1,5 +1,6 @@
 package com.example.HRApplication.Services;
 
+import com.example.HRApplication.Models.Attendance;
 import com.example.HRApplication.Models.Complaint;
 import com.example.HRApplication.Models.Enums.ComplaintStatus;
 import com.example.HRApplication.Models.User;
@@ -47,8 +48,8 @@ public class ComplaintService {
         }
         return null;
     }
-    public List<Complaint> getComplaintsByUser(User user) {
-        return complaintRepository.findByFiledBy(user);
+    public List<Complaint> getComplaintsByUserId(Integer userId) {
+        return complaintRepository.findByFiledById(userId);
     }
 
     public void deleteComplaint(Long id) {

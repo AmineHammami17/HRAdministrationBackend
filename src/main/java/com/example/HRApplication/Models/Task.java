@@ -20,8 +20,17 @@ public class Task {
     private String activityName;
 
 
-    @Column(name="time_spent")
-    private Long timeSpent;
+    @Column(name="monday")
+    private String monday;
+    @Column(name="tuesday")
+    private String tuesday;
+    @Column(name="wednesday")
+    private String wednesday;
+    @Column(name="thursday")
+    private String thursday;
+    @Column(name="friday")
+    private String friday;
+
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
@@ -37,14 +46,19 @@ public class Task {
     public Task() {
     }
 
-    public Task(Long id, LocalDate date, String activityName, Long timeSpent, Project project, User user) {
+    public Task(Long id, LocalDate date, String activityName, String monday, String tuesday, String wednesday, String thursday, String friday, Project project, User user) {
         this.id = id;
         this.date = date;
         this.activityName = activityName;
-        this.timeSpent = timeSpent;
+        this.monday = monday;
+        this.tuesday = tuesday;
+        this.wednesday = wednesday;
+        this.thursday = thursday;
+        this.friday = friday;
         this.project = project;
         this.user = user;
     }
+
 
     public Long getId() {
         return id;
@@ -86,11 +100,43 @@ public class Task {
         this.user = user;
     }
 
-    public Long getTimeSpent() {
-        return timeSpent;
+    public String getMonday() {
+        return monday;
     }
 
-    public void setTimeSpent(Long timeSpent) {
-        this.timeSpent = timeSpent;
+    public void setMonday(String monday) {
+        this.monday = monday;
+    }
+
+    public String getTuesday() {
+        return tuesday;
+    }
+
+    public void setTuesday(String tuesday) {
+        this.tuesday = tuesday;
+    }
+
+    public String getWednesday() {
+        return wednesday;
+    }
+
+    public void setWednesday(String wednesday) {
+        this.wednesday = wednesday;
+    }
+
+    public String getThursday() {
+        return thursday;
+    }
+
+    public void setThursday(String thursday) {
+        this.thursday = thursday;
+    }
+
+    public String getFriday() {
+        return friday;
+    }
+
+    public void setFriday(String friday) {
+        this.friday = friday;
     }
 }
