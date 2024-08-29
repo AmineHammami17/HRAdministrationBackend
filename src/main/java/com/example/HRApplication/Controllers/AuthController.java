@@ -81,8 +81,11 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<ReqRes> signUp(@RequestBody ReqRes signUpRequest){
+        System.out.println("Received Registration Request: " + signUpRequest);
+        System.out.println("User details: " + signUpRequest.getUser());
         return ResponseEntity.ok(authService.signUp(signUpRequest));
     }
+
 
     @PostMapping("/signin")
     public ResponseEntity<ReqRes> signIn(@RequestBody SignInDTO signInRequest) {

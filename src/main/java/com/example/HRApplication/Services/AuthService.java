@@ -96,6 +96,7 @@ public class AuthService {
     private double calculatePercentageChange(double oldSalary, double newSalary) {
         return ((newSalary - oldSalary) / oldSalary) * 100;
     }
+
     public ReqRes signUp(ReqRes registrationRequest) {
         ReqRes resp = new ReqRes();
         try {
@@ -143,6 +144,7 @@ public class AuthService {
         }
         return resp;
     }
+
 
     public ResponseEntity<ReqRes> signIn(SignInDTO signinRequest) {
         ReqRes response = new ReqRes();
